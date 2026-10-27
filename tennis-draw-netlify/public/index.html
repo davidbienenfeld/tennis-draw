@@ -1,0 +1,745 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Friends Open Draw</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Ccircle cx=%2216%22 cy=%2216%22 r=%2214%22 fill=%22%23d6ef2c%22/%3E%3Cpath d=%22M6 6c6 5 6 15 0 20M26 6c-6 5-6 15 0 20%22 stroke=%22%23fff%22 stroke-width=%222%22 fill=%22none%22/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: a hard-court header band, then a working surface — sign-up before the draw, a left-to-right bracket after it. */
+:root {
+  --bg: #edf1f6;
+  --surface: #ffffff;
+  --ink: #0f1e33;
+  --muted: #5a6a80;
+  --line: #d4dde9;
+  --court: #1d4b87;
+  --court-deep: #163b6c;
+  --court-ink: #ffffff;
+  --link: #1d5fb0;
+  --ball: #d6ef2c;
+  --ball-ink: #1b2400;
+  --danger: #b4322a;
+  --win-bg: #f4f9d6;
+  --display: "Big Shoulders Display", "Arial Narrow", Impact, sans-serif;
+  --body: "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0a1524; --surface: #111f36; --ink: #e6edf7; --muted: #90a2bb; --line: #243858;
+    --court: #1a447c; --court-deep: #12335f; --court-ink: #ffffff; --link: #7db3f2;
+    --ball: #d6ef2c; --ball-ink: #1b2400; --danger: #f07a70; --win-bg: #1e2f1a;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0a1524; --surface: #111f36; --ink: #e6edf7; --muted: #90a2bb; --line: #243858;
+  --court: #1a447c; --court-deep: #12335f; --court-ink: #ffffff; --link: #7db3f2;
+  --ball: #d6ef2c; --ball-ink: #1b2400; --danger: #f07a70; --win-bg: #1e2f1a;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+:root { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+body { margin: 0; }
+img { max-width: 100%; }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.5; }
+.wrap { max-width: 1180px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+
+/* header: a court seen from above */
+header.band { background: var(--court); color: var(--court-ink); }
+header .wrap { padding-block: 28px 30px; position: relative; overflow: hidden; }
+header .wrap::before { content: ""; position: absolute; inset: 14px max(16px, env(safe-area-inset-right, 0px)) 14px max(16px, env(safe-area-inset-left, 0px)); border: 2px solid rgba(255,255,255,.28); border-left-width: 0; pointer-events: none; }
+header .wrap::after { content: ""; position: absolute; top: 14px; bottom: 14px; right: 34%; border-left: 2px solid rgba(255,255,255,.28); pointer-events: none; }
+.eyebrow { font-size: 12px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; opacity: .8; }
+.title-row { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; position: relative; z-index: 1; }
+h1 { font-family: var(--display); font-weight: 800; font-size: clamp(40px, 8vw, 68px); line-height: .95; margin: 6px 0 0; letter-spacing: .01em; text-wrap: balance; text-transform: uppercase; }
+.rename-btn { background: none; border: 1px solid rgba(255,255,255,.4); color: var(--court-ink); border-radius: 4px; font: 500 12px var(--body); padding: 3px 8px; cursor: pointer; }
+.rename-btn:hover { background: rgba(255,255,255,.12); }
+#rename-form { display: flex; gap: 8px; margin-top: 8px; position: relative; z-index: 1; flex-wrap: wrap; }
+#rename-form input { font: 700 22px var(--display); text-transform: uppercase; padding: 4px 10px; border-radius: 4px; border: 0; min-width: 0; width: min(420px, 100%); color: #0f1e33; background: #fff; }
+.status { display: inline-flex; align-items: center; gap: 8px; margin-top: 14px; background: var(--court-deep); border-radius: 999px; padding: 5px 14px 5px 8px; font-size: 13px; font-weight: 600; position: relative; z-index: 1; }
+.ball { width: 14px; height: 14px; border-radius: 50%; background: var(--ball); flex: none; position: relative; overflow: hidden; box-shadow: inset 0 0 0 1px rgba(0,0,0,.15); }
+.ball::after { content: ""; position: absolute; inset: -40% 35% -40% -55%; border: 1.5px solid rgba(255,255,255,.85); border-radius: 50%; }
+
+main { padding-block: 26px 60px; display: grid; gap: 28px; }
+main > *, #play > * { min-width: 0; }
+.notice { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 10px 14px; font-size: 14px; color: var(--muted); }
+h2 { font-family: var(--display); font-weight: 800; font-size: 28px; text-transform: uppercase; letter-spacing: .02em; margin: 0; line-height: 1.05; }
+h2 small { font-family: var(--body); font-size: 13px; font-weight: 500; text-transform: none; letter-spacing: 0; color: var(--muted); margin-left: 8px; }
+.lede { color: var(--muted); margin: 6px 0 0; max-width: 62ch; }
+.grid2 { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 28px; align-items: start; }
+@media (max-width: 820px) { .grid2 { grid-template-columns: minmax(0, 1fr); } }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 20px; display: grid; gap: 16px; min-width: 0; }
+
+label.fld { display: grid; gap: 6px; font-weight: 600; font-size: 13px; }
+input[type=text], select { font: 500 15px var(--body); color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 9px 11px; width: 100%; min-width: 0; }
+input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+.ntrp-scale { display: grid; grid-template-columns: repeat(9, minmax(0, 1fr)); gap: 4px; }
+.ntrp-scale label { cursor: pointer; }
+.ntrp-scale input { position: absolute; opacity: 0; pointer-events: none; }
+.ntrp-scale span { display: block; text-align: center; padding: 8px 0; border: 1px solid var(--line); border-radius: 5px; font: 600 13px var(--mono); background: var(--bg); }
+.ntrp-scale input:checked + span { background: var(--court); color: var(--court-ink); border-color: var(--court); }
+.ntrp-scale input:focus-visible + span { outline: 2px solid var(--link); outline-offset: 2px; }
+#ntrp-desc { font-size: 13px; color: var(--muted); font-weight: 500; min-height: 1.5em; }
+.btn { font: 700 14px var(--body); border-radius: 6px; padding: 10px 16px; border: 1px solid transparent; cursor: pointer; background: var(--court); color: var(--court-ink); }
+.btn:hover { filter: brightness(1.08); }
+.btn:disabled { opacity: .45; cursor: not-allowed; filter: none; }
+.btn.ballbtn { background: var(--ball); color: var(--ball-ink); }
+.btn.ghost { background: transparent; color: var(--ink); border-color: var(--line); }
+.btn.danger { background: var(--danger); color: #fff; }
+.linkbtn { background: none; border: 0; padding: 2px 4px; color: var(--muted); font: 500 13px var(--body); cursor: pointer; border-radius: 4px; }
+.linkbtn:hover { color: var(--danger); }
+.linkbtn.armed { color: var(--danger); font-weight: 700; }
+
+/* entries */
+.entries { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+.entries li { display: grid; grid-template-columns: 34px minmax(0, 1fr) auto auto; gap: 12px; align-items: center; padding: 10px 2px; border-bottom: 1px solid var(--line); }
+.seedno { font: 600 13px var(--mono); color: var(--muted); text-align: right; font-variant-numeric: tabular-nums; }
+.pname { font-weight: 600; overflow-wrap: anywhere; }
+.pname small { display: block; font-weight: 400; color: var(--muted); font-size: 12.5px; }
+.ntrp-chip { font: 600 12.5px var(--mono); padding: 2px 8px; border-radius: 4px; background: var(--bg); border: 1px solid var(--line); white-space: nowrap; }
+.tag { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); border: 1px dashed var(--line); border-radius: 3px; padding: 0 5px; margin-left: 6px; }
+.empty { padding: 26px 8px; text-align: center; color: var(--muted); border: 1px dashed var(--line); border-radius: 8px; }
+.drawbox { display: grid; gap: 12px; border-top: 1px solid var(--line); padding-top: 16px; }
+.drawrow { display: flex; flex-wrap: wrap; gap: 10px; align-items: end; }
+.drawrow label.fld { flex: 1 1 220px; }
+.hint { font-size: 13px; color: var(--muted); margin: 0; }
+
+/* champion + up next */
+.champ { background: var(--ball); color: var(--ball-ink); border-radius: 8px; padding: 18px 22px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 18px; }
+.champ .label { font-size: 12px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+.champ .who { font-family: var(--display); font-weight: 800; font-size: clamp(32px, 6vw, 48px); text-transform: uppercase; line-height: 1; }
+.champ .how { font: 600 14px var(--mono); }
+.upnext { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+.upnext button { display: grid; gap: 2px; text-align: left; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 9px 12px; cursor: pointer; color: var(--ink); font: 500 14px var(--body); max-width: 100%; }
+.upnext button:hover { border-color: var(--link); }
+.upnext .rd { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.upnext .vs { color: var(--muted); font-weight: 400; }
+
+/* bracket */
+.bracket-scroll { overflow-x: auto; margin-top: 14px; padding-bottom: 8px; }
+.bracket { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(230px, 1fr); gap: 26px; min-width: min-content; }
+.round { display: flex; flex-direction: column; gap: 10px; }
+.round h3 { margin: 0; font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.slots { flex: 1; display: flex; flex-direction: column; justify-content: space-around; gap: 14px; }
+.match { display: block; width: 100%; text-align: left; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 0; color: var(--ink); font: inherit; overflow: hidden; }
+button.match { cursor: pointer; }
+button.match:hover { border-color: var(--link); }
+.match.ready { border-color: var(--court); box-shadow: inset 3px 0 0 var(--ball); }
+.mrow { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; gap: 8px; align-items: center; padding: 7px 10px; min-height: 36px; }
+.mrow + .mrow { border-top: 1px solid var(--line); }
+.mrow .sd { font: 500 11px var(--mono); color: var(--muted); text-align: right; }
+.mrow .nm { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 14px; }
+.mrow.tbd .nm { color: var(--muted); font-style: italic; }
+.mrow.won { background: var(--win-bg); }
+.mrow.won .nm { font-weight: 700; }
+.mrow.lost .nm { color: var(--muted); }
+.cells { display: flex; gap: 3px; align-items: center; }
+.cells span { font: 600 13px var(--mono); min-width: 18px; text-align: center; font-variant-numeric: tabular-nums; }
+.cells span.w { color: var(--ink); }
+.cells span.l { color: var(--muted); font-weight: 500; }
+.cells .ball { width: 11px; height: 11px; min-width: 0; margin-left: 4px; }
+[hidden] { display: none !important; }
+.mfoot { font-size: 12px; color: var(--muted); padding: 5px 10px; border-top: 1px solid var(--line); background: var(--bg); overflow-wrap: anywhere; }
+.section-head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 10px; }
+.reset { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+
+/* dialog */
+dialog { border: 1px solid var(--line); border-radius: 10px; padding: 0; background: var(--surface); color: var(--ink); width: min(460px, calc(100vw - 32px)); }
+dialog::backdrop { background: rgba(6, 14, 28, .55); }
+.dlg { padding: 20px; display: grid; gap: 16px; }
+.dlg h3 { margin: 0; font-family: var(--display); font-size: 26px; text-transform: uppercase; line-height: 1; }
+.dlg .sub { color: var(--muted); font-size: 13px; margin-top: 4px; }
+.board { background: var(--court-deep); color: var(--court-ink); border-radius: 6px; padding: 10px 12px; display: grid; gap: 6px; }
+.board .brow { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; gap: 8px; align-items: center; }
+.board .hdr { font: 600 11px var(--mono); opacity: .7; text-transform: uppercase; }
+.board .bn { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.board .bsets { display: flex; gap: 5px; }
+.board .bsets > * { width: 40px; text-align: center; }
+.board input { font: 600 17px var(--mono); padding: 5px 0; border-radius: 4px; border: 0; background: rgba(255,255,255,.95); color: #0f1e33; width: 40px; text-align: center; }
+.board input[type=radio] { width: 16px; height: 16px; accent-color: var(--ball); margin: 0; }
+.board .pick { display: flex; justify-content: center; }
+.seg { display: flex; gap: 0; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+.seg label { flex: 1; text-align: center; cursor: pointer; }
+.seg input { position: absolute; opacity: 0; pointer-events: none; }
+.seg span { display: block; padding: 7px 4px; font-size: 13px; font-weight: 600; }
+.seg label + label span { border-left: 1px solid var(--line); }
+.seg input:checked + span { background: var(--court); color: var(--court-ink); }
+.seg input:focus-visible + span { outline: 2px solid var(--link); outline-offset: -2px; }
+.err { color: var(--danger); font-size: 13px; font-weight: 600; min-height: 1.2em; margin: 0; }
+.dlg-actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: space-between; }
+.dlg-actions .r { display: flex; gap: 8px; margin-left: auto; }
+.lock { font-size: 13px; color: var(--muted); background: var(--bg); border-radius: 6px; padding: 8px 10px; }
+
+.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(18px + env(safe-area-inset-bottom, 0px)); background: var(--ink); color: var(--bg); padding: 9px 16px; border-radius: 6px; font-size: 14px; font-weight: 600; max-width: calc(100vw - 32px); z-index: 20; }
+@media (prefers-reduced-motion: no-preference) { .toast { animation: rise .2s ease-out; } }
+@keyframes rise { from { transform: translate(-50%, 8px); opacity: 0; } }
+</style>
+</head>
+<body>
+
+<header class="band">
+  <div class="wrap">
+    <div class="eyebrow">Singles draw · Self-rated NTRP seeding</div>
+    <div class="title-row">
+      <h1 id="t-name">Friends Open</h1>
+      <button class="rename-btn" id="rename-open" type="button" hidden>Rename</button>
+    </div>
+    <form id="rename-form" hidden>
+      <input type="text" id="rename-input" maxlength="40" aria-label="Tournament name">
+      <button class="btn ballbtn" type="submit">Save</button>
+      <button class="btn ghost" type="button" id="rename-cancel" style="color:var(--court-ink);border-color:rgba(255,255,255,.4)">Cancel</button>
+    </form>
+    <div class="status"><span class="ball"></span><span id="status-text">Loading the draw…</span></div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="notice" id="notice" hidden></div>
+
+  <!-- Before the draw -->
+  <section id="signup" hidden>
+    <div class="grid2">
+      <div class="panel" id="join-panel">
+        <div>
+          <h2>Enter the draw</h2>
+          <p class="lede">Rate yourself honestly. Seeds come from these ratings, so the strongest players meet late.</p>
+        </div>
+        <form id="join" class="panel" style="padding:0;border:0;gap:14px">
+          <label class="fld" for="join-name">Your name
+            <input type="text" id="join-name" maxlength="32" autocomplete="name" placeholder="e.g. Dana R." required>
+          </label>
+          <div class="fld" role="radiogroup" aria-labelledby="ntrp-label">
+            <span id="ntrp-label" style="font-weight:600;font-size:13px">Self-rating (NTRP)</span>
+            <div class="ntrp-scale" id="ntrp-scale"></div>
+            <div id="ntrp-desc"></div>
+          </div>
+          <button class="btn" type="submit" id="join-btn">Add me to the draw</button>
+        </form>
+      </div>
+
+      <div class="panel">
+        <div>
+          <h2>Entries <small id="entry-count"></small></h2>
+          <p class="hint" style="margin-top:6px">Ordered by rating, which is how seeds are set. Equal ratings are shuffled when the draw is made.</p>
+        </div>
+        <ul class="entries" id="entries"></ul>
+        <div class="drawbox" id="drawbox">
+          <div class="drawrow">
+            <label class="fld" for="format">Match format
+              <select id="format">
+                <option value="set1">One set, tiebreak at 6–6</option>
+                <option value="pro8">Pro set to 8</option>
+                <option value="bo3tb" selected>Best of 3, match tiebreak for the 3rd</option>
+                <option value="bo3">Best of 3 sets</option>
+              </select>
+            </label>
+            <button class="btn ballbtn" type="button" id="make-draw">Make the draw</button>
+          </div>
+          <p class="hint" id="draw-hint"></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- After the draw -->
+  <section id="play" hidden style="display:grid;gap:28px">
+    <div id="champ"></div>
+    <div id="upnext-wrap">
+      <h2>Up next</h2>
+      <div class="upnext" id="upnext"></div>
+    </div>
+    <div>
+      <div class="section-head">
+        <h2>The bracket <small id="format-label"></small></h2>
+      </div>
+      <div class="bracket-scroll"><div class="bracket" id="bracket"></div></div>
+    </div>
+    <div class="panel">
+      <h2>Seeds</h2>
+      <ul class="entries" id="seeds"></ul>
+      <div id="waitlist"></div>
+      <div class="reset" id="reset-box"></div>
+    </div>
+  </section>
+</main>
+
+<dialog id="dlg">
+  <form class="dlg" id="score-form" method="dialog">
+    <div>
+      <h3 id="dlg-title">Match</h3>
+      <div class="sub" id="dlg-sub"></div>
+    </div>
+    <div class="board" id="board"></div>
+    <div class="fld" style="gap:6px">
+      <span style="font-weight:600;font-size:13px">Result</span>
+      <div class="seg" id="result-seg">
+        <label><input type="radio" name="result" value="done" id="res-done" checked><span>Played out</span></label>
+        <label><input type="radio" name="result" value="ret" id="res-ret"><span>Retired</span></label>
+        <label><input type="radio" name="result" value="wo" id="res-wo"><span>Walkover</span></label>
+      </div>
+    </div>
+    <label class="fld" for="when">When &amp; where
+      <input type="text" id="when" maxlength="60" placeholder="Sat 9am, Riverside court 3">
+    </label>
+    <div class="lock" id="lock" hidden></div>
+    <p class="err" id="dlg-err" role="alert"></p>
+    <div class="dlg-actions">
+      <button class="btn ghost" type="button" id="clear-result" hidden>Clear result</button>
+      <div class="r">
+        <button class="btn ghost" type="button" id="dlg-cancel">Cancel</button>
+        <button class="btn" type="submit" id="dlg-save">Save</button>
+      </div>
+    </div>
+  </form>
+</dialog>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<script>
+const NTRP = [
+  [2.0, "New to the game"], [2.5, "Learning to rally"], [3.0, "Consistent at medium pace"],
+  [3.5, "Directional control, getting comfortable at net"], [4.0, "Dependable strokes, some variety"],
+  [4.5, "Power and spin, solid serve"], [5.0, "Builds points, has a weapon"],
+  [5.5, "Tournament-level"], [6.0, "Ranked junior or college player"],
+];
+const FORMATS = {
+  set1: { label: "One set, tiebreak at 6–6", cols: ["Set"] },
+  pro8: { label: "Pro set to 8", cols: ["Pro"] },
+  bo3: { label: "Best of 3 sets", cols: ["1", "2", "3"] },
+  bo3tb: { label: "Best of 3, match tiebreak for the 3rd", cols: ["1", "2", "TB"] },
+};
+const EXAMPLES = [
+  ["Priya", 4.0], ["Marcus", 3.5], ["Jo", 4.5], ["Sam", 3.0], ["Elena", 3.5], ["Theo", 2.5],
+];
+
+const S = { players: {}, meta: { name: "Friends Open" }, draw: null, mode: "loading", canWrite: true };
+
+const $ = (id) => document.getElementById(id);
+function h(tag, attrs, ...kids) {
+  const el = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs || {})) {
+    if (v == null || v === false) continue;
+    if (k === "class") el.className = v;
+    else if (k.startsWith("on")) el.addEventListener(k.slice(2), v);
+    else el.setAttribute(k, v === true ? "" : v);
+  }
+  for (const c of kids.flat()) if (c != null && c !== false) el.append(c instanceof Node ? c : document.createTextNode(String(c)));
+  return el;
+}
+const fmtN = (n) => Number(n).toFixed(1);
+const ntrpText = (n) => (NTRP.find(([v]) => v === Number(n)) || [0, ""])[1];
+
+let toastT;
+function toast(msg) {
+  const t = $("toast"); t.textContent = msg; t.hidden = false;
+  clearTimeout(toastT); toastT = setTimeout(() => (t.hidden = true), 2600);
+}
+
+/* ---------- storage: the site's /api/state backend, or in-page examples when it's missing ---------- */
+const API = "/api/state";
+let lastJson = "";
+function applyState(s) {
+  const j = JSON.stringify(s);
+  if (j === lastJson) return;
+  lastJson = j;
+  S.players = s.players || {}; S.meta = { name: "Friends Open", ...(s.meta || {}) }; S.draw = s.draw || null;
+  render();
+}
+async function post(action, payload) {
+  const r = await fetch(API, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ action, ...payload }) });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw { code: "server", message: j.error || "That didn't save. Try again." };
+  applyState(j);
+}
+async function run(fn, okMsg) {
+  try { await fn(); if (okMsg) toast(okMsg); return true; }
+  catch (e) {
+    toast(e && e.code === "server" ? e.message : "That didn't save. Check your connection and try again.");
+    if (S.mode === "live") refresh();
+    return false;
+  }
+}
+const local = () => S.mode === "local";
+const api = {
+  addPlayer: (p) => local() ? (S.players["local" + Date.now()] = p, render()) : post("addPlayer", { name: p.name, ntrp: p.ntrp }),
+  removePlayer: (id) => local() ? (delete S.players[id], render()) : post("removePlayer", { id }),
+  setMeta: (m) => local() ? (Object.assign(S.meta, m), render()) : post("setMeta", m),
+  setDraw: (d) => local() ? (S.draw = d, render()) : post("setDraw", { draw: d }),
+  clearDraw: () => local() ? (S.draw = null, render()) : post("clearDraw", {}),
+  patchMatches: (patch) => {
+    if (!local()) return post("patchMatches", { patch });
+    for (const k in patch) S.draw.matches[k] = { ...S.draw.matches[k], ...patch[k] };
+    render();
+  },
+};
+
+/* ---------- draw logic ---------- */
+function seedOrder(size) {
+  let o = [1];
+  while (o.length < size) { const n = o.length * 2 + 1; o = o.flatMap((s) => [s, n - s]); }
+  return o;
+}
+const nextOf = (r, i) => [`r${r + 1}m${Math.floor(i / 2)}`, i % 2 === 0 ? "p1" : "p2"];
+function roundName(draw, r) {
+  const left = draw.size / 2 ** (r - 1);
+  return left === 2 ? "Final" : left === 4 ? "Semifinals" : left === 8 ? "Quarterfinals" : `Round of ${left}`;
+}
+function sortedPlayers() {
+  return Object.entries(S.players).map(([id, p]) => ({ id, ...p }))
+    .sort((a, b) => b.ntrp - a.ntrp || String(a.joinedAt).localeCompare(String(b.joinedAt)));
+}
+function bracketSize(n) { let s = 2; while (s < n) s *= 2; return s; }
+
+function makeDraw(format) {
+  const list = Object.entries(S.players).map(([id, p]) => ({ id, ...p, r: Math.random() }))
+    .sort((a, b) => b.ntrp - a.ntrp || a.r - b.r);
+  const N = list.length, size = bracketSize(N), rounds = Math.log2(size);
+  const entrants = {};
+  list.forEach((p, i) => (entrants[p.id] = { name: p.name, ntrp: p.ntrp, seed: i + 1 }));
+  const matches = {};
+  for (let r = 1; r <= rounds; r++)
+    for (let i = 0; i < size / 2 ** r; i++)
+      matches[`r${r}m${i}`] = { p1: null, p2: null, winner: null, sets: [], result: null, when: "" };
+  const order = seedOrder(size);
+  for (let i = 0; i < size / 2; i++) {
+    const a = order[2 * i], b = order[2 * i + 1], m = matches[`r1m${i}`];
+    m.p1 = a <= N ? list[a - 1].id : null;
+    m.p2 = b <= N ? list[b - 1].id : null;
+    if (!m.p1 || !m.p2) {
+      m.winner = m.p1 || m.p2; m.result = "bye";
+      if (rounds > 1) { const [nid, slot] = nextOf(1, i); matches[nid][slot] = m.winner; }
+    }
+  }
+  return { format, size, rounds, entrants, matches, createdAt: new Date().toISOString() };
+}
+
+function champion(d) { return d.matches[`r${d.rounds}m0`]?.winner || null; }
+function currentRound(d) {
+  for (let r = 1; r <= d.rounds; r++)
+    for (let i = 0; i < d.size / 2 ** r; i++) if (!d.matches[`r${r}m${i}`].winner) return r;
+  return null;
+}
+function nextPlayed(d, id) {
+  const [, r, i] = id.match(/^r(\d+)m(\d+)$/).map(Number);
+  if (r >= d.rounds) return false;
+  return !!d.matches[nextOf(r, i)[0]].winner;
+}
+
+/* ---------- rendering ---------- */
+function render() {
+  document.title = (S.meta.name || "Friends Open") + " Draw";
+  $("t-name").textContent = S.meta.name || "Friends Open";
+  $("rename-open").hidden = !S.canWrite || S.mode === "loading" || !$("rename-form").hidden;
+
+  const notice = $("notice");
+  if (S.mode === "local") { notice.hidden = false; notice.textContent = "Preview mode: the entries below are examples, and nothing here is saved or shared. The tournament server isn't reachable, so this page is showing a local demo."; }
+  else if (S.mode === "live" && !S.canWrite) { notice.hidden = false; notice.textContent = "You're following this draw. Ask the organizer for Contributor access to enter yourself or record scores."; }
+  else notice.hidden = true;
+
+  const d = S.draw;
+  $("signup").hidden = !!d || S.mode === "loading";
+  $("play").hidden = !d;
+
+  if (S.mode === "loading") $("status-text").textContent = "Loading the draw…";
+  else if (!d) $("status-text").textContent = `Sign-ups open · ${Object.keys(S.players).length} entered`;
+  else {
+    const c = champion(d), r = currentRound(d);
+    $("status-text").textContent = c ? `Champion: ${d.entrants[c]?.name}` : `${roundName(d, r)} in play · ${Object.keys(d.entrants).length} players`;
+  }
+  if (!d) renderSignup(); else renderPlay(d);
+}
+
+function removeButton(id, name) {
+  const b = h("button", { class: "linkbtn", type: "button", "aria-label": `Remove ${name}` }, "Remove");
+  b.addEventListener("click", () => {
+    if (!b.classList.contains("armed")) {
+      b.classList.add("armed"); b.textContent = "Confirm";
+      setTimeout(() => { b.classList.remove("armed"); b.textContent = "Remove"; }, 3000);
+      return;
+    }
+    run(() => api.removePlayer(id), `${name} removed`);
+  });
+  return b;
+}
+
+function renderSignup() {
+  $("join-panel").hidden = !S.canWrite;
+  const list = sortedPlayers();
+  $("entry-count").textContent = list.length ? `${list.length} player${list.length === 1 ? "" : "s"}` : "";
+  const ul = $("entries"); ul.replaceChildren();
+  if (!list.length) ul.append(h("li", { style: "display:block;border:0;padding:12px 0 0" },
+    h("div", { class: "empty" }, "No one has entered yet. Add your name and rating to start the list, then share this page with the group.")));
+  list.forEach((p, i) => ul.append(h("li", null,
+    h("span", { class: "seedno" }, i + 1),
+    h("span", { class: "pname" }, p.name, S.mode === "local" ? h("span", { class: "tag" }, "Example") : null, h("small", null, ntrpText(p.ntrp))),
+    h("span", { class: "ntrp-chip" }, fmtN(p.ntrp)),
+    S.canWrite ? removeButton(p.id, p.name) : h("span"))));
+
+  const n = list.length, size = bracketSize(n), byes = size - n;
+  const rounds = Math.log2(size);
+  $("make-draw").disabled = n < 2 || !S.canWrite;
+  $("drawbox").hidden = !S.canWrite && n < 2;
+  $("draw-hint").textContent = n < 2 ? "You need at least 2 players to make a draw."
+    : `${n} players → a ${size}-player bracket, ${rounds} round${rounds > 1 ? "s" : ""}. ` +
+      (byes ? `The top ${byes} seed${byes > 1 ? "s get byes" : " gets a bye"} into round 2.` : "No byes needed.");
+}
+
+function setCells(sets, side, d) {
+  const cols = FORMATS[d.format]?.cols || [];
+  return sets.map((s, k) => {
+    const mine = s[side], theirs = s[1 - side];
+    return h("span", { class: mine > theirs ? "w" : "l", title: cols[k] === "TB" ? "Match tiebreak" : null }, mine);
+  });
+}
+
+function matchCard(d, id, r, i) {
+  const m = d.matches[id];
+  const ready = m.p1 && m.p2 && !m.winner;
+  const clickable = S.canWrite && m.p1 && m.p2;
+  const row = (pid, side) => {
+    if (!pid) {
+      const isBye = r === 1 && m.result === "bye";
+      return h("div", { class: "mrow tbd" }, h("span", { class: "sd" }), h("span", { class: "nm" }, isBye ? "Bye" : "To be decided"), h("span"));
+    }
+    const e = d.entrants[pid] || { name: "Withdrawn", seed: "" };
+    const st = m.winner ? (m.winner === pid ? "won" : "lost") : "";
+    return h("div", { class: `mrow ${st}` },
+      h("span", { class: "sd" }, e.seed),
+      h("span", { class: "nm", title: e.name }, e.name),
+      h("span", { class: "cells" }, setCells(m.sets || [], side, d), m.winner === pid && m.result !== "bye" ? h("span", { class: "ball", "aria-label": "Winner" }) : null));
+  };
+  let foot = [];
+  if (m.result === "ret") foot.push("Retired");
+  if (m.result === "wo") foot.push("Walkover");
+  if (m.when && !m.winner) foot.push(m.when);
+  if (ready && !m.when && S.canWrite) foot.push("Tap to set a time or enter the score");
+  const kids = [row(m.p1, 0), row(m.p2, 1), foot.length ? h("div", { class: "mfoot" }, foot.join(" · ")) : null];
+  const label = `${roundName(d, r)}, match ${i + 1}`;
+  return clickable
+    ? h("button", { class: `match${ready ? " ready" : ""}`, type: "button", "aria-label": label, onclick: () => openMatch(id) }, kids)
+    : h("div", { class: "match", "aria-label": label }, kids);
+}
+
+function renderPlay(d) {
+  const c = champion(d);
+  const champ = $("champ"); champ.replaceChildren();
+  if (c) {
+    const fm = d.matches[`r${d.rounds}m0`];
+    const loser = fm.p1 === c ? fm.p2 : fm.p1;
+    const side = fm.p1 === c ? 0 : 1;
+    const score = (fm.sets || []).map((s) => `${s[side]}–${s[1 - side]}`).join("  ");
+    champ.append(h("div", { class: "champ" },
+      h("div", null, h("div", { class: "label" }, `${S.meta.name || "Friends Open"} champion`), h("div", { class: "who" }, d.entrants[c]?.name)),
+      h("div", { class: "how" }, `def. ${d.entrants[loser]?.name || "—"}  ${score}${fm.result === "ret" ? " ret." : fm.result === "wo" ? " (w/o)" : ""}`)));
+  }
+
+  const up = [];
+  for (let r = 1; r <= d.rounds; r++)
+    for (let i = 0; i < d.size / 2 ** r; i++) {
+      const id = `r${r}m${i}`, m = d.matches[id];
+      if (m.p1 && m.p2 && !m.winner) up.push({ id, r, m });
+    }
+  $("upnext-wrap").hidden = !up.length;
+  $("upnext").replaceChildren(...up.map(({ id, r, m }) => h("button", { type: "button", onclick: () => openMatch(id), disabled: !S.canWrite },
+    h("span", { class: "rd" }, roundName(d, r) + (m.when ? ` · ${m.when}` : "")),
+    h("span", null, d.entrants[m.p1]?.name, h("span", { class: "vs" }, " vs "), d.entrants[m.p2]?.name))));
+
+  $("format-label").textContent = FORMATS[d.format]?.label || "";
+  const br = $("bracket"); br.replaceChildren();
+  for (let r = 1; r <= d.rounds; r++) {
+    const slots = [];
+    for (let i = 0; i < d.size / 2 ** r; i++) slots.push(matchCard(d, `r${r}m${i}`, r, i));
+    br.append(h("div", { class: "round" }, h("h3", null, roundName(d, r)), h("div", { class: "slots" }, slots)));
+  }
+
+  const seeds = Object.entries(d.entrants).sort((a, b) => a[1].seed - b[1].seed);
+  $("seeds").replaceChildren(...seeds.map(([, e]) => h("li", null,
+    h("span", { class: "seedno" }, e.seed), h("span", { class: "pname" }, e.name, h("small", null, ntrpText(e.ntrp))),
+    h("span", { class: "ntrp-chip" }, fmtN(e.ntrp)), h("span"))));
+
+  const late = sortedPlayers().filter((p) => !d.entrants[p.id]);
+  $("waitlist").replaceChildren(...(late.length ? [h("p", { class: "hint" },
+    `Signed up after the draw: ${late.map((p) => `${p.name} (${fmtN(p.ntrp)})`).join(", ")}. They'll be seeded in the next draw.`)] : []));
+
+  const rb = $("reset-box"); rb.replaceChildren();
+  if (S.canWrite) {
+    const start = h("button", { class: "btn ghost", type: "button" }, c ? "Start a new tournament" : "Scrap this draw");
+    start.addEventListener("click", () => {
+      rb.replaceChildren(
+        h("span", { class: "hint", style: "flex-basis:100%" }, "This clears the bracket and every result. Entries stay, so you can add or remove players and make a fresh draw."),
+        h("button", { class: "btn danger", type: "button", onclick: () => run(() => api.clearDraw(), "Draw cleared") }, "Clear the bracket"),
+        h("button", { class: "btn ghost", type: "button", onclick: () => render() }, "Keep it"));
+    });
+    rb.append(start);
+  }
+}
+
+/* ---------- sign-up form ---------- */
+(function buildScale() {
+  const wrap = $("ntrp-scale");
+  NTRP.forEach(([v]) => wrap.append(h("label", null,
+    h("input", { type: "radio", name: "ntrp", value: v, id: "ntrp-" + String(v).replace(".", "-"), checked: v === 3.5 }),
+    h("span", null, fmtN(v)))));
+  const upd = () => { const v = Number(document.querySelector("input[name=ntrp]:checked").value); $("ntrp-desc").textContent = `${fmtN(v)}: ${ntrpText(v)}`; };
+  wrap.addEventListener("change", upd); upd();
+})();
+
+$("join").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const name = $("join-name").value.trim().replace(/\s+/g, " ");
+  if (!name) return;
+  if (Object.values(S.players).some((p) => p.name.toLowerCase() === name.toLowerCase())) { toast(`${name} is already in the draw`); return; }
+  const ntrp = Number(document.querySelector("input[name=ntrp]:checked").value);
+  $("join-btn").disabled = true;
+  const ok = await run(() => api.addPlayer({ name, ntrp, joinedAt: new Date().toISOString() }), `${name} entered at ${fmtN(ntrp)}`);
+  $("join-btn").disabled = false;
+  if (ok) $("join-name").value = "";
+});
+
+$("make-draw").addEventListener("click", () => {
+  if (Object.keys(S.players).length < 2) return;
+  run(() => api.setDraw(makeDraw($("format").value)), "The draw is out");
+});
+
+/* rename */
+$("rename-open").addEventListener("click", () => {
+  $("rename-form").hidden = false; $("rename-open").hidden = true;
+  $("rename-input").value = S.meta.name || ""; $("rename-input").focus();
+});
+$("rename-cancel").addEventListener("click", () => { $("rename-form").hidden = true; render(); });
+$("rename-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const name = $("rename-input").value.trim();
+  if (!name) return;
+  $("rename-form").hidden = true;
+  await run(() => api.setMeta({ name }), "Renamed");
+  render();
+});
+
+/* ---------- score dialog ---------- */
+let openId = null;
+function openMatch(id) {
+  const d = S.draw, m = d.matches[id];
+  if (!m.p1 || !m.p2 || !S.canWrite) return;
+  openId = id;
+  const [, r, i] = id.match(/^r(\d+)m(\d+)$/).map(Number);
+  const cols = FORMATS[d.format]?.cols || ["Set"];
+  $("dlg-title").textContent = roundName(d, r);
+  $("dlg-sub").textContent = `Match ${i + 1} · ${FORMATS[d.format]?.label || ""}`;
+  const locked = !!m.winner && nextPlayed(d, id);
+  const board = $("board"); board.replaceChildren(
+    h("div", { class: "brow hdr" }, h("span"), h("span", null, "Player"), h("span", { class: "bsets" }, cols.map((c) => h("span", null, c)))));
+  [m.p1, m.p2].forEach((pid, side) => {
+    const e = d.entrants[pid];
+    board.append(h("div", { class: "brow" },
+      h("span", { class: "pick" }, h("input", { type: "radio", name: "winner", value: pid, id: `win-${side}`, "aria-label": `${e.name} wins`, checked: m.winner === pid })),
+      h("label", { class: "bn", for: `win-${side}` }, `${e.seed}. ${e.name}`),
+      h("span", { class: "bsets" }, cols.map((c, k) => h("input", {
+        type: "text", inputmode: "numeric", maxlength: 2, id: `s${side}-${k}`, "aria-label": `${e.name}, ${c === "TB" ? "match tiebreak" : "set " + (cols.length > 1 ? k + 1 : "")}`,
+        value: m.sets?.[k] ? m.sets[k][side] : "", disabled: locked,
+      })))));
+  });
+  $(m.result === "ret" ? "res-ret" : m.result === "wo" ? "res-wo" : "res-done").checked = true;
+  $("when").value = m.when || "";
+  $("lock").hidden = !locked;
+  $("lock").textContent = locked ? "This result is locked because the winner has already played their next match." : "";
+  document.querySelectorAll("#result-seg input").forEach((x) => (x.disabled = locked));
+  $("clear-result").hidden = !m.winner || locked;
+  $("dlg-err").textContent = "";
+  syncPick();
+  $("dlg").showModal();
+}
+function syncPick() {
+  const manual = !$("res-done").checked;
+  document.querySelectorAll("#board .pick").forEach((p) => (p.style.visibility = manual ? "visible" : "hidden"));
+}
+$("result-seg").addEventListener("change", syncPick);
+$("dlg-cancel").addEventListener("click", () => $("dlg").close());
+
+function readSets(nCols) {
+  const sets = [];
+  for (let k = 0; k < nCols; k++) {
+    const a = $(`s0-${k}`).value.trim(), b = $(`s1-${k}`).value.trim();
+    if (a === "" && b === "") continue;
+    if (!/^\d+$/.test(a) || !/^\d+$/.test(b)) return { error: `Enter both scores for set ${k + 1}, or leave both blank.` };
+    sets.push([Number(a), Number(b)]);
+  }
+  return { sets };
+}
+
+$("score-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const d = S.draw, id = openId, m = d.matches[id];
+  const [, r, i] = id.match(/^r(\d+)m(\d+)$/).map(Number);
+  const when = $("when").value.trim();
+  const locked = !!m.winner && nextPlayed(d, id);
+  const patch = { [id]: { when } };
+  if (!locked) {
+    const result = document.querySelector("input[name=result]:checked").value;
+    const { sets, error } = readSets((FORMATS[d.format]?.cols || ["Set"]).length);
+    if (error) { $("dlg-err").textContent = error; return; }
+    let winner = null;
+    if (result === "done") {
+      if (sets.length) {
+        let w0 = 0, w1 = 0;
+        for (const [a, b] of sets) {
+          if (a === b) { $("dlg-err").textContent = "A set can't finish level. Check the games."; return; }
+          a > b ? w0++ : w1++;
+        }
+        if (w0 === w1) { $("dlg-err").textContent = "Sets are tied. Enter the deciding set, or mark it as retired."; return; }
+        winner = w0 > w1 ? m.p1 : m.p2;
+      }
+    } else {
+      winner = document.querySelector("input[name=winner]:checked")?.value || null;
+      if (!winner) { $("dlg-err").textContent = "Pick who advances."; return; }
+    }
+    if (winner) {
+      Object.assign(patch[id], { winner, sets: result === "wo" ? [] : sets, result });
+      if (r < d.rounds) { const [nid, slot] = nextOf(r, i); patch[nid] = { [slot]: winner }; }
+    } else if (m.winner) {
+      $("dlg-err").textContent = "Enter the score, or use Clear result to undo it."; return;
+    }
+  }
+  $("dlg-save").disabled = true;
+  const won = patch[id].winner && d.entrants[patch[id].winner]?.name;
+  const ok = await run(() => api.patchMatches(patch), won ? `${won} advances` : "Saved");
+  $("dlg-save").disabled = false;
+  if (ok) $("dlg").close();
+});
+
+$("clear-result").addEventListener("click", async () => {
+  const d = S.draw, id = openId;
+  const [, r, i] = id.match(/^r(\d+)m(\d+)$/).map(Number);
+  const patch = { [id]: { winner: null, sets: [], result: null } };
+  if (r < d.rounds) { const [nid, slot] = nextOf(r, i); patch[nid] = { [slot]: null }; }
+  if (await run(() => api.patchMatches(patch), "Result cleared")) $("dlg").close();
+});
+
+/* ---------- boot ---------- */
+function startLocal() {
+  S.mode = "local";
+  const t0 = Date.parse("2026-10-20T12:00:00Z");
+  EXAMPLES.forEach(([name, ntrp], k) => (S.players["ex" + k] = { name, ntrp, joinedAt: new Date(t0 + k * 6e4).toISOString() }));
+  render();
+}
+async function refresh() {
+  const r = await fetch(API, { cache: "no-store" });
+  if (!r.ok || !(r.headers.get("content-type") || "").includes("json")) throw new Error("no backend");
+  applyState(await r.json());
+}
+async function init() {
+  render();
+  try { await refresh(); } catch { return startLocal(); }
+  S.mode = "live"; render();
+  // Pick up friends' entries and scores; pause while the tab is hidden.
+  setInterval(() => { if (!document.hidden) refresh().catch(() => {}); }, 5000);
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) refresh().catch(() => {}); });
+}
+init();
+</script>
+</body>
+</html>
