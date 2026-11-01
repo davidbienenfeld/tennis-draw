@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Friends Open Draw</title>
+<title>Tennis Draws</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Ccircle cx=%2216%22 cy=%2216%22 r=%2214%22 fill=%22%23d6ef2c%22/%3E%3Cpath d=%22M6 6c6 5 6 15 0 20M26 6c-6 5-6 15 0 20%22 stroke=%22%23fff%22 stroke-width=%222%22 fill=%22none%22/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
@@ -124,7 +124,7 @@ input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px s
 .bracket { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(230px, 1fr); gap: 26px; min-width: min-content; }
 .round { display: flex; flex-direction: column; gap: 10px; }
 .round h3 { margin: 0; font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
-.slots { flex: 1; display: flex; flex-direction: column; justify-content: space-around; gap: 14px; }
+.slots { flex: 1; display: flex; flex-direction: column; justify-content: flex-start; gap: 18px; }
 .match { display: block; width: 100%; text-align: left; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 0; color: var(--ink); font: inherit; overflow: hidden; }
 button.match { cursor: pointer; }
 button.match:hover { border-color: var(--link); }
@@ -177,15 +177,52 @@ dialog::backdrop { background: rgba(6, 14, 28, .55); }
 .toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(18px + env(safe-area-inset-bottom, 0px)); background: var(--ink); color: var(--bg); padding: 9px 16px; border-radius: 6px; font-size: 14px; font-weight: 600; max-width: calc(100vw - 32px); z-index: 20; }
 @media (prefers-reduced-motion: no-preference) { .toast { animation: rise .2s ease-out; } }
 @keyframes rise { from { transform: translate(-50%, 8px); opacity: 0; } }
+
+/* tournaments list */
+.back { display: inline-block; color: var(--court-ink); opacity: .85; font-size: 13px; font-weight: 600; text-decoration: none; margin-bottom: 10px; position: relative; z-index: 1; }
+.back:hover { opacity: 1; text-decoration: underline; }
+.tlist { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.tlist a { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 14px; align-items: center; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; color: var(--ink); text-decoration: none; }
+.tlist a:hover { border-color: var(--link); }
+.tlist .tn { font-family: var(--display); font-weight: 800; font-size: 24px; text-transform: uppercase; line-height: 1.05; overflow-wrap: anywhere; }
+.tlist .ts { font-size: 13px; color: var(--muted); grid-column: 1; }
+.tlist .go { grid-row: 1 / span 2; grid-column: 2; color: var(--muted); font-size: 20px; }
+.pill { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; padding: 1px 7px; border-radius: 999px; margin-right: 6px; vertical-align: 1px; }
+.pill.signup { background: var(--bg); border: 1px solid var(--line); color: var(--ink); }
+.pill.playing { background: var(--court); color: var(--court-ink); }
+.pill.complete { background: var(--ball); color: var(--ball-ink); }
+.newt { display: flex; flex-wrap: wrap; gap: 10px; align-items: end; }
+.newt label.fld { flex: 1 1 240px; }
+
+/* seeding controls */
+.entries.seeding li { grid-template-columns: 34px minmax(0, 1fr) auto auto auto; }
+.moves { display: flex; gap: 2px; }
+.moves button { width: 30px; height: 30px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); border-radius: 5px; cursor: pointer; font-size: 14px; line-height: 1; }
+.moves button:hover:not(:disabled) { border-color: var(--link); }
+.moves button:disabled { opacity: .3; cursor: default; }
+.seedhead { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; font-size: 13px; color: var(--muted); margin-top: 6px; }
+
+/* placement draw */
+.round .rtitle { display: grid; gap: 0; }
+.round .rtitle small { font-size: 12px; color: var(--muted); }
+.slots .grp { display: flex; flex-direction: column; gap: 8px; }
+.grp-label { font-size: 11.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--court); }
+.standings { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 0 24px; }
+.standings li { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 8px; align-items: baseline; padding: 7px 0; border-bottom: 1px solid var(--line); }
+.standings .pl { font: 600 13px var(--mono); color: var(--muted); }
+.standings li.top .pl { color: var(--ink); }
+.standings .who { font-weight: 600; overflow-wrap: anywhere; }
+.standings .who.tbd { color: var(--muted); font-weight: 400; font-style: italic; }
+.danger-zone { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
 </style>
 </head>
 <body>
-
 <header class="band">
   <div class="wrap">
-    <div class="eyebrow">Singles draw · Self-rated NTRP seeding</div>
+    <a class="back" href="#" id="back" hidden>← All tournaments</a>
+    <div class="eyebrow" id="eyebrow">Singles draws · Self-rated NTRP seeding</div>
     <div class="title-row">
-      <h1 id="t-name">Friends Open</h1>
+      <h1 id="t-name">Tennis Draws</h1>
       <button class="rename-btn" id="rename-open" type="button" hidden>Rename</button>
     </div>
     <form id="rename-form" hidden>
@@ -193,20 +230,40 @@ dialog::backdrop { background: rgba(6, 14, 28, .55); }
       <button class="btn ballbtn" type="submit">Save</button>
       <button class="btn ghost" type="button" id="rename-cancel" style="color:var(--court-ink);border-color:rgba(255,255,255,.4)">Cancel</button>
     </form>
-    <div class="status"><span class="ball"></span><span id="status-text">Loading the draw…</span></div>
+    <div class="status"><span class="ball"></span><span id="status-text">Loading…</span></div>
   </div>
 </header>
 
 <main class="wrap">
   <div class="notice" id="notice" hidden></div>
 
+  <!-- All tournaments -->
+  <section id="home" hidden style="display:grid;gap:28px">
+    <div class="panel">
+      <div>
+        <h2>Start a tournament</h2>
+        <p class="lede">Each tournament has its own sign-ups, seeding and bracket. Everyone plays every round, so nobody goes home after one match and every player finishes with a place.</p>
+      </div>
+      <form class="newt" id="new-form">
+        <label class="fld" for="new-name">Tournament name
+          <input type="text" id="new-name" maxlength="40" placeholder="e.g. Spring Open 2027" required>
+        </label>
+        <button class="btn ballbtn" type="submit" id="new-btn">Create tournament</button>
+      </form>
+    </div>
+    <div>
+      <h2>Tournaments</h2>
+      <ul class="tlist" id="tlist" style="margin-top:12px"></ul>
+    </div>
+  </section>
+
   <!-- Before the draw -->
   <section id="signup" hidden>
     <div class="grid2">
-      <div class="panel" id="join-panel">
+      <div class="panel">
         <div>
           <h2>Enter the draw</h2>
-          <p class="lede">Rate yourself honestly. Seeds come from these ratings, so the strongest players meet late.</p>
+          <p class="lede">Rate yourself honestly. Seeds start from these ratings, so the strongest players meet late.</p>
         </div>
         <form id="join" class="panel" style="padding:0;border:0;gap:14px">
           <label class="fld" for="join-name">Your name
@@ -223,11 +280,11 @@ dialog::backdrop { background: rgba(6, 14, 28, .55); }
 
       <div class="panel">
         <div>
-          <h2>Entries <small id="entry-count"></small></h2>
-          <p class="hint" style="margin-top:6px">Ordered by rating, which is how seeds are set. Equal ratings are shuffled when the draw is made.</p>
+          <h2>Seeding <small id="entry-count"></small></h2>
+          <div class="seedhead" id="seedhead"></div>
         </div>
-        <ul class="entries" id="entries"></ul>
-        <div class="drawbox" id="drawbox">
+        <ul class="entries seeding" id="entries"></ul>
+        <div class="drawbox">
           <div class="drawrow">
             <label class="fld" for="format">Match format
               <select id="format">
@@ -253,18 +310,22 @@ dialog::backdrop { background: rgba(6, 14, 28, .55); }
       <div class="upnext" id="upnext"></div>
     </div>
     <div>
-      <div class="section-head">
-        <h2>The bracket <small id="format-label"></small></h2>
-      </div>
+      <h2>The draw <small id="format-label"></small></h2>
+      <p class="hint" style="margin-top:6px">Winners move up and losers move down each round, so every match decides a range of places.</p>
       <div class="bracket-scroll"><div class="bracket" id="bracket"></div></div>
+    </div>
+    <div class="panel">
+      <h2>Places</h2>
+      <ol class="standings" id="standings"></ol>
     </div>
     <div class="panel">
       <h2>Seeds</h2>
       <ul class="entries" id="seeds"></ul>
       <div id="waitlist"></div>
-      <div class="reset" id="reset-box"></div>
     </div>
   </section>
+
+  <div class="danger-zone" id="danger" hidden></div>
 </main>
 
 <dialog id="dlg">
@@ -299,24 +360,12 @@ dialog::backdrop { background: rgba(6, 14, 28, .55); }
 
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
-<script>
-const NTRP = [
-  [2.0, "New to the game"], [2.5, "Learning to rally"], [3.0, "Consistent at medium pace"],
-  [3.5, "Directional control, getting comfortable at net"], [4.0, "Dependable strokes, some variety"],
-  [4.5, "Power and spin, solid serve"], [5.0, "Builds points, has a weapon"],
-  [5.5, "Tournament-level"], [6.0, "Ranked junior or college player"],
-];
-const FORMATS = {
-  set1: { label: "One set, tiebreak at 6–6", cols: ["Set"] },
-  pro8: { label: "Pro set to 8", cols: ["Pro"] },
-  bo3: { label: "Best of 3 sets", cols: ["1", "2", "3"] },
-  bo3tb: { label: "Best of 3, match tiebreak for the 3rd", cols: ["1", "2", "TB"] },
-};
-const EXAMPLES = [
-  ["Priya", 4.0], ["Marcus", 3.5], ["Jo", 4.5], ["Sam", 3.0], ["Elena", 3.5], ["Theo", 2.5],
-];
+<script type="module">
+import { NTRP, FORMATS, effectiveOrder, bracketSize, resolve, groupLabel, ordinal, winnerFromSets } from "./bracket.mjs";
 
-const S = { players: {}, meta: { name: "Friends Open" }, draw: null, mode: "loading", canWrite: true };
+const API = "/api/state";
+const S = { route: { view: "home" }, list: null, t: null, v: null, error: null, offline: false };
+let lastJson = "";
 
 const $ = (id) => document.getElementById(id);
 function h(tag, attrs, ...kids) {
@@ -332,253 +381,275 @@ function h(tag, attrs, ...kids) {
 }
 const fmtN = (n) => Number(n).toFixed(1);
 const ntrpText = (n) => (NTRP.find(([v]) => v === Number(n)) || [0, ""])[1];
+const plural = (n, w) => `${n} ${w}${n === 1 ? "" : "s"}`;
 
 let toastT;
 function toast(msg) {
   const t = $("toast"); t.textContent = msg; t.hidden = false;
-  clearTimeout(toastT); toastT = setTimeout(() => (t.hidden = true), 2600);
+  clearTimeout(toastT); toastT = setTimeout(() => (t.hidden = true), 2800);
 }
 
-/* ---------- storage: the site's /api/state backend, or in-page examples when it's missing ---------- */
-const API = "/api/state";
-let lastJson = "";
-function applyState(s) {
-  const j = JSON.stringify(s);
+/* ---------- talking to the server ---------- */
+function setData(json) {
+  const j = JSON.stringify(json);
   if (j === lastJson) return;
   lastJson = j;
-  S.players = s.players || {}; S.meta = { name: "Friends Open", ...(s.meta || {}) }; S.draw = s.draw || null;
+  if (S.route.view === "home") S.list = json.tournaments;
+  else { S.t = json; S.v = json.draw ? resolve(json.draw) : null; }
   render();
 }
-async function post(action, payload) {
-  const r = await fetch(API, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ action, ...payload }) });
-  const j = await r.json().catch(() => ({}));
-  if (!r.ok) throw { code: "server", message: j.error || "That didn't save. Try again." };
-  applyState(j);
+async function refresh() {
+  const url = S.route.view === "home" ? API : `${API}?t=${encodeURIComponent(S.route.id)}`;
+  const r = await fetch(url, { cache: "no-store" });
+  const isJson = (r.headers.get("content-type") || "").includes("json");
+  if (!isJson) throw new Error("offline");
+  S.offline = false;
+  if (r.status === 404) { S.error = "missing"; lastJson = ""; render(); return; }
+  S.error = null;
+  setData(await r.json());
 }
-async function run(fn, okMsg) {
-  try { await fn(); if (okMsg) toast(okMsg); return true; }
-  catch (e) {
-    toast(e && e.code === "server" ? e.message : "That didn't save. Check your connection and try again.");
-    if (S.mode === "live") refresh();
+async function post(action, payload = {}) {
+  const r = await fetch(API, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ action, t: S.route.id, ...payload }) });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw { server: true, message: j.error || "That didn't save. Try again." };
+  return j;
+}
+async function run(action, payload, okMsg) {
+  try {
+    const j = await post(action, payload);
+    if (j && j.id && S.route.view === "t") setData(j);
+    if (okMsg) toast(typeof okMsg === "function" ? okMsg(j) : okMsg);
+    return j || true;
+  } catch (e) {
+    toast(e && e.server ? e.message : "That didn't save. Check your connection and try again.");
+    refresh().catch(() => {});
     return false;
   }
 }
-const local = () => S.mode === "local";
-const api = {
-  addPlayer: (p) => local() ? (S.players["local" + Date.now()] = p, render()) : post("addPlayer", { name: p.name, ntrp: p.ntrp }),
-  removePlayer: (id) => local() ? (delete S.players[id], render()) : post("removePlayer", { id }),
-  setMeta: (m) => local() ? (Object.assign(S.meta, m), render()) : post("setMeta", m),
-  setDraw: (d) => local() ? (S.draw = d, render()) : post("setDraw", { draw: d }),
-  clearDraw: () => local() ? (S.draw = null, render()) : post("clearDraw", {}),
-  patchMatches: (patch) => {
-    if (!local()) return post("patchMatches", { patch });
-    for (const k in patch) S.draw.matches[k] = { ...S.draw.matches[k], ...patch[k] };
-    render();
-  },
-};
 
-/* ---------- draw logic ---------- */
-function seedOrder(size) {
-  let o = [1];
-  while (o.length < size) { const n = o.length * 2 + 1; o = o.flatMap((s) => [s, n - s]); }
-  return o;
+/* ---------- routing: #t-<id> is a tournament, no hash is the list ---------- */
+function readRoute() {
+  const m = location.hash.match(/^#t-([A-Za-z0-9_-]+)$/);
+  S.route = m ? { view: "t", id: m[1] } : { view: "home" };
+  S.t = null; S.v = null; S.error = null; lastJson = "";
+  $("rename-form").hidden = true;
+  if ($("dlg").open) $("dlg").close();
+  render();
+  refresh().catch(() => { S.offline = true; render(); });
+  window.scrollTo(0, 0);
 }
-const nextOf = (r, i) => [`r${r + 1}m${Math.floor(i / 2)}`, i % 2 === 0 ? "p1" : "p2"];
-function roundName(draw, r) {
-  const left = draw.size / 2 ** (r - 1);
-  return left === 2 ? "Final" : left === 4 ? "Semifinals" : left === 8 ? "Quarterfinals" : `Round of ${left}`;
-}
-function sortedPlayers() {
-  return Object.entries(S.players).map(([id, p]) => ({ id, ...p }))
-    .sort((a, b) => b.ntrp - a.ntrp || String(a.joinedAt).localeCompare(String(b.joinedAt)));
-}
-function bracketSize(n) { let s = 2; while (s < n) s *= 2; return s; }
-
-function makeDraw(format) {
-  const list = Object.entries(S.players).map(([id, p]) => ({ id, ...p, r: Math.random() }))
-    .sort((a, b) => b.ntrp - a.ntrp || a.r - b.r);
-  const N = list.length, size = bracketSize(N), rounds = Math.log2(size);
-  const entrants = {};
-  list.forEach((p, i) => (entrants[p.id] = { name: p.name, ntrp: p.ntrp, seed: i + 1 }));
-  const matches = {};
-  for (let r = 1; r <= rounds; r++)
-    for (let i = 0; i < size / 2 ** r; i++)
-      matches[`r${r}m${i}`] = { p1: null, p2: null, winner: null, sets: [], result: null, when: "" };
-  const order = seedOrder(size);
-  for (let i = 0; i < size / 2; i++) {
-    const a = order[2 * i], b = order[2 * i + 1], m = matches[`r1m${i}`];
-    m.p1 = a <= N ? list[a - 1].id : null;
-    m.p2 = b <= N ? list[b - 1].id : null;
-    if (!m.p1 || !m.p2) {
-      m.winner = m.p1 || m.p2; m.result = "bye";
-      if (rounds > 1) { const [nid, slot] = nextOf(1, i); matches[nid][slot] = m.winner; }
-    }
-  }
-  return { format, size, rounds, entrants, matches, createdAt: new Date().toISOString() };
-}
-
-function champion(d) { return d.matches[`r${d.rounds}m0`]?.winner || null; }
-function currentRound(d) {
-  for (let r = 1; r <= d.rounds; r++)
-    for (let i = 0; i < d.size / 2 ** r; i++) if (!d.matches[`r${r}m${i}`].winner) return r;
-  return null;
-}
-function nextPlayed(d, id) {
-  const [, r, i] = id.match(/^r(\d+)m(\d+)$/).map(Number);
-  if (r >= d.rounds) return false;
-  return !!d.matches[nextOf(r, i)[0]].winner;
-}
+window.addEventListener("hashchange", readRoute);
 
 /* ---------- rendering ---------- */
 function render() {
-  document.title = (S.meta.name || "Friends Open") + " Draw";
-  $("t-name").textContent = S.meta.name || "Friends Open";
-  $("rename-open").hidden = !S.canWrite || S.mode === "loading" || !$("rename-form").hidden;
+  const home = S.route.view === "home", t = S.t;
+  const loaded = home ? !!S.list : !!t;
+  $("back").hidden = home;
+  $("eyebrow").textContent = home ? "Singles draws · Self-rated NTRP seeding" : "Singles · Everyone plays every round";
+  $("t-name").textContent = home ? "Tennis Draws" : t ? t.name : S.error ? "Not found" : "Loading…";
+  document.title = home ? "Tennis Draws" : t ? `${t.name} · Tennis Draws` : "Tennis Draws";
+  $("rename-open").hidden = home || !t || !$("rename-form").hidden;
 
   const notice = $("notice");
-  if (S.mode === "local") { notice.hidden = false; notice.textContent = "Preview mode: the entries below are examples, and nothing here is saved or shared. The tournament server isn't reachable, so this page is showing a local demo."; }
-  else if (S.mode === "live" && !S.canWrite) { notice.hidden = false; notice.textContent = "You're following this draw. Ask the organizer for Contributor access to enter yourself or record scores."; }
-  else notice.hidden = true;
+  notice.hidden = !(S.offline || S.error);
+  if (S.offline) notice.textContent = "Can't reach the tournament server. Check your connection; this page will keep trying.";
+  else if (S.error) notice.replaceChildren("This tournament doesn't exist. It may have been deleted. ", h("a", { href: "#" }, "See all tournaments"));
 
-  const d = S.draw;
-  $("signup").hidden = !!d || S.mode === "loading";
-  $("play").hidden = !d;
+  $("home").hidden = !home || !loaded;
+  $("signup").hidden = home || !t || !!t.draw;
+  $("play").hidden = home || !t || !t.draw;
+  $("danger").hidden = home || !t;
 
-  if (S.mode === "loading") $("status-text").textContent = "Loading the draw…";
-  else if (!d) $("status-text").textContent = `Sign-ups open · ${Object.keys(S.players).length} entered`;
-  else {
-    const c = champion(d), r = currentRound(d);
-    $("status-text").textContent = c ? `Champion: ${d.entrants[c]?.name}` : `${roundName(d, r)} in play · ${Object.keys(d.entrants).length} players`;
+  const st = $("status-text");
+  if (home) {
+    st.textContent = S.list ? `${plural(S.list.length, "tournament")}` : "Loading…";
+    if (S.list) renderHome();
+    return;
   }
-  if (!d) renderSignup(); else renderPlay(d);
+  if (!t) { st.textContent = S.error ? "Not found" : "Loading…"; return; }
+  if (!t.draw) st.textContent = `Sign-ups open · ${plural(Object.keys(t.players).length, "player")}`;
+  else if (S.v.complete) st.textContent = `Champion: ${t.draw.entrants[S.v.champion]?.name}`;
+  else st.textContent = `Round ${S.v.currentRound} of ${t.draw.rounds} in play · ${Object.keys(t.draw.entrants).length} players`;
+  if (!t.draw) renderSignup(); else renderPlay();
+  renderDanger();
 }
 
-function removeButton(id, name) {
-  const b = h("button", { class: "linkbtn", type: "button", "aria-label": `Remove ${name}` }, "Remove");
-  b.addEventListener("click", () => {
-    if (!b.classList.contains("armed")) {
-      b.classList.add("armed"); b.textContent = "Confirm";
-      setTimeout(() => { b.classList.remove("armed"); b.textContent = "Remove"; }, 3000);
+function renderHome() {
+  const ul = $("tlist");
+  if (!S.list.length) {
+    ul.replaceChildren(h("li", null, h("div", { class: "empty" }, "No tournaments yet. Name your first one above, then share its link with the group.")));
+    return;
+  }
+  ul.replaceChildren(...S.list.map((t) => {
+    const status = t.status === "signup" ? [h("span", { class: "pill signup" }, "Sign-ups"), `${plural(t.players, "player")} entered`]
+      : t.status === "playing" ? [h("span", { class: "pill playing" }, "In play"), `Round ${t.round} of ${t.rounds} · ${t.players} players`]
+      : [h("span", { class: "pill complete" }, "Complete"), `Champion: ${t.champion}`];
+    const date = new Date(t.createdAt).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+    return h("li", null, h("a", { href: `#t-${t.id}` },
+      h("span", { class: "tn" }, t.name), h("span", { class: "go", "aria-hidden": "true" }, "›"),
+      h("span", { class: "ts" }, status, ` · started ${date}`)));
+  }));
+}
+
+function armed(btn, label, confirmLabel, action) {
+  btn.addEventListener("click", () => {
+    if (!btn.classList.contains("armed")) {
+      btn.classList.add("armed"); btn.textContent = confirmLabel;
+      setTimeout(() => { btn.classList.remove("armed"); btn.textContent = label; }, 3000);
       return;
     }
-    run(() => api.removePlayer(id), `${name} removed`);
+    action();
   });
-  return b;
+  return btn;
 }
 
 function renderSignup() {
-  $("join-panel").hidden = !S.canWrite;
-  const list = sortedPlayers();
-  $("entry-count").textContent = list.length ? `${list.length} player${list.length === 1 ? "" : "s"}` : "";
+  const t = S.t, order = effectiveOrder(t);
+  $("entry-count").textContent = order.length ? plural(order.length, "player") : "";
+  const sh = $("seedhead"); sh.replaceChildren();
+  if (Array.isArray(t.order)) {
+    sh.append(h("span", null, "Seeding edited by hand."),
+      h("button", { class: "linkbtn", type: "button", style: "color:var(--link)", onclick: () => run("setOrder", { order: null }, "Seeding reset to ratings") }, "Reset to ratings"));
+  } else sh.append(h("span", null, "Seeded by rating, then by sign-up time. Use the arrows to change the order."));
+
+  const move = (k, d) => {
+    const next = order.slice(); [next[k], next[k + d]] = [next[k + d], next[k]];
+    run("setOrder", { order: next });
+  };
   const ul = $("entries"); ul.replaceChildren();
-  if (!list.length) ul.append(h("li", { style: "display:block;border:0;padding:12px 0 0" },
-    h("div", { class: "empty" }, "No one has entered yet. Add your name and rating to start the list, then share this page with the group.")));
-  list.forEach((p, i) => ul.append(h("li", null,
-    h("span", { class: "seedno" }, i + 1),
-    h("span", { class: "pname" }, p.name, S.mode === "local" ? h("span", { class: "tag" }, "Example") : null, h("small", null, ntrpText(p.ntrp))),
-    h("span", { class: "ntrp-chip" }, fmtN(p.ntrp)),
-    S.canWrite ? removeButton(p.id, p.name) : h("span"))));
-
-  const n = list.length, size = bracketSize(n), byes = size - n;
-  const rounds = Math.log2(size);
-  $("make-draw").disabled = n < 2 || !S.canWrite;
-  $("drawbox").hidden = !S.canWrite && n < 2;
-  $("draw-hint").textContent = n < 2 ? "You need at least 2 players to make a draw."
-    : `${n} players → a ${size}-player bracket, ${rounds} round${rounds > 1 ? "s" : ""}. ` +
-      (byes ? `The top ${byes} seed${byes > 1 ? "s get byes" : " gets a bye"} into round 2.` : "No byes needed.");
-}
-
-function setCells(sets, side, d) {
-  const cols = FORMATS[d.format]?.cols || [];
-  return sets.map((s, k) => {
-    const mine = s[side], theirs = s[1 - side];
-    return h("span", { class: mine > theirs ? "w" : "l", title: cols[k] === "TB" ? "Match tiebreak" : null }, mine);
+  if (!order.length) ul.append(h("li", { style: "display:block;border:0;padding:12px 0 0" },
+    h("div", { class: "empty" }, "No one has entered yet. Add your name and rating, then share this page's link with the group.")));
+  order.forEach((id, k) => {
+    const p = t.players[id];
+    ul.append(h("li", null,
+      h("span", { class: "seedno" }, k + 1),
+      h("span", { class: "pname" }, p.name, h("small", null, ntrpText(p.ntrp))),
+      h("span", { class: "ntrp-chip" }, fmtN(p.ntrp)),
+      h("span", { class: "moves" },
+        h("button", { type: "button", "aria-label": `Move ${p.name} up`, disabled: k === 0, onclick: () => move(k, -1) }, "↑"),
+        h("button", { type: "button", "aria-label": `Move ${p.name} down`, disabled: k === order.length - 1, onclick: () => move(k, 1) }, "↓")),
+      armed(h("button", { class: "linkbtn", type: "button", "aria-label": `Remove ${p.name}` }, "Remove"), "Remove", "Confirm",
+        () => run("removePlayer", { id }, `${p.name} removed`))));
   });
+
+  const n = order.length, size = bracketSize(n), byes = size - n, rounds = Math.log2(size);
+  $("make-draw").disabled = n < 2;
+  $("draw-hint").textContent = n < 2 ? "You need at least 2 players to make a draw."
+    : `${n} players → a ${size}-player draw. ` + (byes
+      ? `Everyone plays up to ${plural(rounds, "match")}; ${plural(byes, "bye")} means a few players get one fewer.`
+      : `Everyone plays ${plural(rounds, "match")} and finishes with a place from 1st to ${ordinal(n)}.`);
 }
 
-function matchCard(d, id, r, i) {
-  const m = d.matches[id];
-  const ready = m.p1 && m.p2 && !m.winner;
-  const clickable = S.canWrite && m.p1 && m.p2;
+function setCells(sets, side) {
+  return sets.map((s) => h("span", { class: s[side] > s[1 - side] ? "w" : "l" }, s[side]));
+}
+
+function matchCard(m) {
+  const d = S.t.draw, n = Object.keys(d.entrants).length;
+  const ready = m.p1 && m.p2 && !m.done;
   const row = (pid, side) => {
-    if (!pid) {
-      const isBye = r === 1 && m.result === "bye";
-      return h("div", { class: "mrow tbd" }, h("span", { class: "sd" }), h("span", { class: "nm" }, isBye ? "Bye" : "To be decided"), h("span"));
-    }
+    if (pid === undefined) return h("div", { class: "mrow tbd" }, h("span", { class: "sd" }), h("span", { class: "nm" }, "To be decided"), h("span"));
+    if (pid === null) return h("div", { class: "mrow tbd" }, h("span", { class: "sd" }), h("span", { class: "nm" }, "Bye"), h("span"));
     const e = d.entrants[pid] || { name: "Withdrawn", seed: "" };
-    const st = m.winner ? (m.winner === pid ? "won" : "lost") : "";
+    const st = m.done && !m.auto ? (m.winner === pid ? "won" : "lost") : m.auto ? "won" : "";
     return h("div", { class: `mrow ${st}` },
       h("span", { class: "sd" }, e.seed),
       h("span", { class: "nm", title: e.name }, e.name),
-      h("span", { class: "cells" }, setCells(m.sets || [], side, d), m.winner === pid && m.result !== "bye" ? h("span", { class: "ball", "aria-label": "Winner" }) : null));
+      h("span", { class: "cells" }, setCells(m.sets, side), m.done && !m.auto && m.winner === pid ? h("span", { class: "ball", "aria-label": "Winner" }) : null));
   };
-  let foot = [];
+  const foot = [];
   if (m.result === "ret") foot.push("Retired");
   if (m.result === "wo") foot.push("Walkover");
-  if (m.when && !m.winner) foot.push(m.when);
-  if (ready && !m.when && S.canWrite) foot.push("Tap to set a time or enter the score");
+  if (m.r === d.rounds && m.done && !m.auto) foot.push(`${ordinal(S.v.places[m.winner])} and ${ordinal(S.v.places[m.loser])} place`);
+  if (m.when && !m.done) foot.push(m.when);
+  if (ready && !m.when) foot.push("Tap to set a time or enter the score");
   const kids = [row(m.p1, 0), row(m.p2, 1), foot.length ? h("div", { class: "mfoot" }, foot.join(" · ")) : null];
-  const label = `${roundName(d, r)}, match ${i + 1}`;
-  return clickable
-    ? h("button", { class: `match${ready ? " ready" : ""}`, type: "button", "aria-label": label, onclick: () => openMatch(id) }, kids)
+  const label = `${groupLabel(m, n)}, round ${m.r}`;
+  return m.p1 && m.p2
+    ? h("button", { class: `match${ready ? " ready" : ""}`, type: "button", "aria-label": label, onclick: () => openMatch(m.id) }, kids)
     : h("div", { class: "match", "aria-label": label }, kids);
 }
 
-function renderPlay(d) {
-  const c = champion(d);
+function renderPlay() {
+  const t = S.t, d = t.draw, v = S.v, n = Object.keys(d.entrants).length;
+  const all = Object.values(v.matches);
+
   const champ = $("champ"); champ.replaceChildren();
-  if (c) {
-    const fm = d.matches[`r${d.rounds}m0`];
-    const loser = fm.p1 === c ? fm.p2 : fm.p1;
-    const side = fm.p1 === c ? 0 : 1;
-    const score = (fm.sets || []).map((s) => `${s[side]}–${s[1 - side]}`).join("  ");
+  if (v.champion) {
+    const fm = v.matches[`r${d.rounds}m0`], side = fm.p1 === v.champion ? 0 : 1;
+    const score = fm.sets.map((s) => `${s[side]}–${s[1 - side]}`).join("  ");
     champ.append(h("div", { class: "champ" },
-      h("div", null, h("div", { class: "label" }, `${S.meta.name || "Friends Open"} champion`), h("div", { class: "who" }, d.entrants[c]?.name)),
-      h("div", { class: "how" }, `def. ${d.entrants[loser]?.name || "—"}  ${score}${fm.result === "ret" ? " ret." : fm.result === "wo" ? " (w/o)" : ""}`)));
+      h("div", null, h("div", { class: "label" }, `${t.name} champion`), h("div", { class: "who" }, d.entrants[v.champion]?.name)),
+      h("div", { class: "how" }, `def. ${d.entrants[fm.loser]?.name || "—"}  ${score}${fm.result === "ret" ? " ret." : fm.result === "wo" ? " (w/o)" : ""}`)));
   }
 
-  const up = [];
-  for (let r = 1; r <= d.rounds; r++)
-    for (let i = 0; i < d.size / 2 ** r; i++) {
-      const id = `r${r}m${i}`, m = d.matches[id];
-      if (m.p1 && m.p2 && !m.winner) up.push({ id, r, m });
-    }
+  const up = all.filter((m) => m.p1 && m.p2 && !m.done).sort((a, b) => a.r - b.r || a.lo - b.lo);
   $("upnext-wrap").hidden = !up.length;
-  $("upnext").replaceChildren(...up.map(({ id, r, m }) => h("button", { type: "button", onclick: () => openMatch(id), disabled: !S.canWrite },
-    h("span", { class: "rd" }, roundName(d, r) + (m.when ? ` · ${m.when}` : "")),
+  $("upnext").replaceChildren(...up.map((m) => h("button", { type: "button", onclick: () => openMatch(m.id) },
+    h("span", { class: "rd" }, `R${m.r} · ${groupLabel(m, n)}` + (m.when ? ` · ${m.when}` : "")),
     h("span", null, d.entrants[m.p1]?.name, h("span", { class: "vs" }, " vs "), d.entrants[m.p2]?.name))));
 
   $("format-label").textContent = FORMATS[d.format]?.label || "";
   const br = $("bracket"); br.replaceChildren();
   for (let r = 1; r <= d.rounds; r++) {
-    const slots = [];
-    for (let i = 0; i < d.size / 2 ** r; i++) slots.push(matchCard(d, `r${r}m${i}`, r, i));
-    br.append(h("div", { class: "round" }, h("h3", null, roundName(d, r)), h("div", { class: "slots" }, slots)));
+    const groups = new Map();
+    for (const m of all.filter((x) => x.r === r)) {
+      if (m.p1 === null && m.p2 === null) continue; // two byes: nothing to show
+      if (!groups.has(m.lo)) groups.set(m.lo, []);
+      groups.get(m.lo).push(m);
+    }
+    const sub = r === d.rounds ? "Final placings" : r === 1 ? "Everyone in one draw" : `${plural(2 ** (r - 1), "group")}`;
+    br.append(h("div", { class: "round" },
+      h("h3", { class: "rtitle" }, `Round ${r}`, h("small", null, sub)),
+      h("div", { class: "slots" }, [...groups.values()].map((ms) => h("div", { class: "grp" },
+        h("div", { class: "grp-label" }, groupLabel(ms[0], n)), ms.map(matchCard))))));
+  }
+
+  const byPlace = {};
+  for (const [pid, p] of Object.entries(v.places)) byPlace[p] = pid;
+  const ol = $("standings"); ol.replaceChildren();
+  for (let p = 1; p <= n; p++) {
+    const pid = byPlace[p];
+    ol.append(h("li", { class: p <= 3 ? "top" : "" }, h("span", { class: "pl" }, ordinal(p)),
+      pid ? h("span", { class: "who" }, d.entrants[pid].name) : h("span", { class: "who tbd" }, "To be decided")));
   }
 
   const seeds = Object.entries(d.entrants).sort((a, b) => a[1].seed - b[1].seed);
   $("seeds").replaceChildren(...seeds.map(([, e]) => h("li", null,
     h("span", { class: "seedno" }, e.seed), h("span", { class: "pname" }, e.name, h("small", null, ntrpText(e.ntrp))),
     h("span", { class: "ntrp-chip" }, fmtN(e.ntrp)), h("span"))));
-
-  const late = sortedPlayers().filter((p) => !d.entrants[p.id]);
+  const late = effectiveOrder(t).filter((id) => !d.entrants[id]).map((id) => t.players[id]);
   $("waitlist").replaceChildren(...(late.length ? [h("p", { class: "hint" },
-    `Signed up after the draw: ${late.map((p) => `${p.name} (${fmtN(p.ntrp)})`).join(", ")}. They'll be seeded in the next draw.`)] : []));
-
-  const rb = $("reset-box"); rb.replaceChildren();
-  if (S.canWrite) {
-    const start = h("button", { class: "btn ghost", type: "button" }, c ? "Start a new tournament" : "Scrap this draw");
-    start.addEventListener("click", () => {
-      rb.replaceChildren(
-        h("span", { class: "hint", style: "flex-basis:100%" }, "This clears the bracket and every result. Entries stay, so you can add or remove players and make a fresh draw."),
-        h("button", { class: "btn danger", type: "button", onclick: () => run(() => api.clearDraw(), "Draw cleared") }, "Clear the bracket"),
-        h("button", { class: "btn ghost", type: "button", onclick: () => render() }, "Keep it"));
-    });
-    rb.append(start);
-  }
+    `Signed up after the draw: ${late.map((p) => `${p.name} (${fmtN(p.ntrp)})`).join(", ")}. They join if you scrap this draw and make a new one.`)] : []));
 }
 
-/* ---------- sign-up form ---------- */
+function renderDanger() {
+  const box = $("danger"), t = S.t;
+  if (box.dataset.open === "1") return;
+  box.replaceChildren();
+  if (t.draw) {
+    box.append(h("button", { class: "btn ghost", type: "button", onclick: () => {
+      box.dataset.open = "1";
+      box.replaceChildren(
+        h("span", { class: "hint", style: "flex-basis:100%" }, "This clears the bracket and every result. Entries and seeding stay, so you can adjust them and make a fresh draw."),
+        h("button", { class: "btn danger", type: "button", onclick: async () => { box.dataset.open = ""; await run("clearDraw", {}, "Draw cleared"); render(); } }, "Clear the bracket"),
+        h("button", { class: "btn ghost", type: "button", onclick: () => { box.dataset.open = ""; render(); } }, "Keep it"));
+    } }, "Scrap this draw"));
+  }
+  box.append(h("button", { class: "btn ghost", type: "button", onclick: () => {
+    box.dataset.open = "1";
+    box.replaceChildren(
+      h("span", { class: "hint", style: "flex-basis:100%" }, `This deletes ${t.name} for everyone: players, draw and results. It can't be undone.`),
+      h("button", { class: "btn danger", type: "button", onclick: async () => {
+        box.dataset.open = "";
+        if (await run("deleteTournament", {}, `${t.name} deleted`)) location.hash = "";
+        else render();
+      } }, "Delete tournament"),
+      h("button", { class: "btn ghost", type: "button", onclick: () => { box.dataset.open = ""; render(); } }, "Keep it"));
+  } }, "Delete tournament"));
+}
+
+/* ---------- forms ---------- */
 (function buildScale() {
   const wrap = $("ntrp-scale");
   NTRP.forEach(([v]) => wrap.append(h("label", null,
@@ -588,27 +659,32 @@ function renderPlay(d) {
   wrap.addEventListener("change", upd); upd();
 })();
 
+$("new-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const name = $("new-name").value.trim();
+  if (!name) return;
+  $("new-btn").disabled = true;
+  const j = await run("createTournament", { name }, `${name} created`);
+  $("new-btn").disabled = false;
+  if (j && j.id) { $("new-name").value = ""; location.hash = `t-${j.id}`; }
+});
+
 $("join").addEventListener("submit", async (e) => {
   e.preventDefault();
   const name = $("join-name").value.trim().replace(/\s+/g, " ");
   if (!name) return;
-  if (Object.values(S.players).some((p) => p.name.toLowerCase() === name.toLowerCase())) { toast(`${name} is already in the draw`); return; }
   const ntrp = Number(document.querySelector("input[name=ntrp]:checked").value);
   $("join-btn").disabled = true;
-  const ok = await run(() => api.addPlayer({ name, ntrp, joinedAt: new Date().toISOString() }), `${name} entered at ${fmtN(ntrp)}`);
+  const ok = await run("addPlayer", { name, ntrp }, `${name} entered at ${fmtN(ntrp)}`);
   $("join-btn").disabled = false;
   if (ok) $("join-name").value = "";
 });
 
-$("make-draw").addEventListener("click", () => {
-  if (Object.keys(S.players).length < 2) return;
-  run(() => api.setDraw(makeDraw($("format").value)), "The draw is out");
-});
+$("make-draw").addEventListener("click", () => run("makeDraw", { format: $("format").value }, "The draw is out"));
 
-/* rename */
 $("rename-open").addEventListener("click", () => {
   $("rename-form").hidden = false; $("rename-open").hidden = true;
-  $("rename-input").value = S.meta.name || ""; $("rename-input").focus();
+  $("rename-input").value = S.t?.name || ""; $("rename-input").focus();
 });
 $("rename-cancel").addEventListener("click", () => { $("rename-form").hidden = true; render(); });
 $("rename-form").addEventListener("submit", async (e) => {
@@ -616,39 +692,39 @@ $("rename-form").addEventListener("submit", async (e) => {
   const name = $("rename-input").value.trim();
   if (!name) return;
   $("rename-form").hidden = true;
-  await run(() => api.setMeta({ name }), "Renamed");
+  await run("rename", { name }, "Renamed");
   render();
 });
 
 /* ---------- score dialog ---------- */
 let openId = null;
 function openMatch(id) {
-  const d = S.draw, m = d.matches[id];
-  if (!m.p1 || !m.p2 || !S.canWrite) return;
+  const d = S.t.draw, m = S.v.matches[id], n = Object.keys(d.entrants).length;
+  if (!m.p1 || !m.p2) return;
   openId = id;
-  const [, r, i] = id.match(/^r(\d+)m(\d+)$/).map(Number);
   const cols = FORMATS[d.format]?.cols || ["Set"];
-  $("dlg-title").textContent = roundName(d, r);
-  $("dlg-sub").textContent = `Match ${i + 1} · ${FORMATS[d.format]?.label || ""}`;
-  const locked = !!m.winner && nextPlayed(d, id);
+  $("dlg-title").textContent = groupLabel(m, n);
+  $("dlg-sub").textContent = `Round ${m.r} · ${FORMATS[d.format]?.label || ""}` +
+    (m.r < d.rounds ? ` · Winner plays for ${ordinal(m.lo)}–${ordinal(Math.min(m.lo + (m.hi - m.lo + 1) / 2 - 1, n))}` : "");
   const board = $("board"); board.replaceChildren(
     h("div", { class: "brow hdr" }, h("span"), h("span", null, "Player"), h("span", { class: "bsets" }, cols.map((c) => h("span", null, c)))));
   [m.p1, m.p2].forEach((pid, side) => {
     const e = d.entrants[pid];
     board.append(h("div", { class: "brow" },
-      h("span", { class: "pick" }, h("input", { type: "radio", name: "winner", value: pid, id: `win-${side}`, "aria-label": `${e.name} wins`, checked: m.winner === pid })),
+      h("span", { class: "pick" }, h("input", { type: "radio", name: "winner", value: pid, id: `win-${side}`, "aria-label": `${e.name} advances`, checked: m.done && m.winner === pid })),
       h("label", { class: "bn", for: `win-${side}` }, `${e.seed}. ${e.name}`),
       h("span", { class: "bsets" }, cols.map((c, k) => h("input", {
-        type: "text", inputmode: "numeric", maxlength: 2, id: `s${side}-${k}`, "aria-label": `${e.name}, ${c === "TB" ? "match tiebreak" : "set " + (cols.length > 1 ? k + 1 : "")}`,
-        value: m.sets?.[k] ? m.sets[k][side] : "", disabled: locked,
+        type: "text", inputmode: "numeric", maxlength: 2, id: `s${side}-${k}`,
+        "aria-label": `${e.name}, ${c === "TB" ? "match tiebreak" : cols.length > 1 ? "set " + (k + 1) : "games"}`,
+        value: m.sets[k] ? m.sets[k][side] : "", disabled: m.locked,
       })))));
   });
   $(m.result === "ret" ? "res-ret" : m.result === "wo" ? "res-wo" : "res-done").checked = true;
   $("when").value = m.when || "";
-  $("lock").hidden = !locked;
-  $("lock").textContent = locked ? "This result is locked because the winner has already played their next match." : "";
-  document.querySelectorAll("#result-seg input").forEach((x) => (x.disabled = locked));
-  $("clear-result").hidden = !m.winner || locked;
+  $("lock").hidden = !m.locked;
+  $("lock").textContent = m.locked ? "This result is locked because a match it led to has already been played." : "";
+  document.querySelectorAll("#result-seg input").forEach((x) => (x.disabled = m.locked));
+  $("clear-result").hidden = !m.done || m.locked;
   $("dlg-err").textContent = "";
   syncPick();
   $("dlg").showModal();
@@ -673,73 +749,42 @@ function readSets(nCols) {
 
 $("score-form").addEventListener("submit", async (e) => {
   e.preventDefault();
-  const d = S.draw, id = openId, m = d.matches[id];
-  const [, r, i] = id.match(/^r(\d+)m(\d+)$/).map(Number);
+  const d = S.t.draw, id = openId, m = S.v.matches[id];
   const when = $("when").value.trim();
-  const locked = !!m.winner && nextPlayed(d, id);
-  const patch = { [id]: { when } };
-  if (!locked) {
+  const err = (msg) => ($("dlg-err").textContent = msg);
+  let action = "setWhen", payload = { match: id, when }, msg = "Saved";
+  if (!m.locked) {
     const result = document.querySelector("input[name=result]:checked").value;
     const { sets, error } = readSets((FORMATS[d.format]?.cols || ["Set"]).length);
-    if (error) { $("dlg-err").textContent = error; return; }
+    if (error) return err(error);
     let winner = null;
     if (result === "done") {
       if (sets.length) {
-        let w0 = 0, w1 = 0;
-        for (const [a, b] of sets) {
-          if (a === b) { $("dlg-err").textContent = "A set can't finish level. Check the games."; return; }
-          a > b ? w0++ : w1++;
-        }
-        if (w0 === w1) { $("dlg-err").textContent = "Sets are tied. Enter the deciding set, or mark it as retired."; return; }
-        winner = w0 > w1 ? m.p1 : m.p2;
+        if (sets.some(([a, b]) => a === b)) return err("A set can't finish level. Check the games.");
+        winner = winnerFromSets(sets, m.p1, m.p2);
+        if (!winner) return err("Sets are tied. Enter the deciding set, or mark it as retired.");
       }
     } else {
       winner = document.querySelector("input[name=winner]:checked")?.value || null;
-      if (!winner) { $("dlg-err").textContent = "Pick who advances."; return; }
+      if (!winner) return err("Pick who advances.");
     }
-    if (winner) {
-      Object.assign(patch[id], { winner, sets: result === "wo" ? [] : sets, result });
-      if (r < d.rounds) { const [nid, slot] = nextOf(r, i); patch[nid] = { [slot]: winner }; }
-    } else if (m.winner) {
-      $("dlg-err").textContent = "Enter the score, or use Clear result to undo it."; return;
-    }
+    if (winner) { action = "recordResult"; payload = { match: id, when, result, winner, sets: result === "wo" ? [] : sets }; msg = `${d.entrants[winner].name} wins`; }
+    else if (m.done) return err("Enter the score, or use Clear result to undo it.");
   }
   $("dlg-save").disabled = true;
-  const won = patch[id].winner && d.entrants[patch[id].winner]?.name;
-  const ok = await run(() => api.patchMatches(patch), won ? `${won} advances` : "Saved");
+  const ok = await run(action, payload, msg);
   $("dlg-save").disabled = false;
   if (ok) $("dlg").close();
 });
 
 $("clear-result").addEventListener("click", async () => {
-  const d = S.draw, id = openId;
-  const [, r, i] = id.match(/^r(\d+)m(\d+)$/).map(Number);
-  const patch = { [id]: { winner: null, sets: [], result: null } };
-  if (r < d.rounds) { const [nid, slot] = nextOf(r, i); patch[nid] = { [slot]: null }; }
-  if (await run(() => api.patchMatches(patch), "Result cleared")) $("dlg").close();
+  if (await run("clearResult", { match: openId }, "Result cleared")) $("dlg").close();
 });
 
-/* ---------- boot ---------- */
-function startLocal() {
-  S.mode = "local";
-  const t0 = Date.parse("2026-10-20T12:00:00Z");
-  EXAMPLES.forEach(([name, ntrp], k) => (S.players["ex" + k] = { name, ntrp, joinedAt: new Date(t0 + k * 6e4).toISOString() }));
-  render();
-}
-async function refresh() {
-  const r = await fetch(API, { cache: "no-store" });
-  if (!r.ok || !(r.headers.get("content-type") || "").includes("json")) throw new Error("no backend");
-  applyState(await r.json());
-}
-async function init() {
-  render();
-  try { await refresh(); } catch { return startLocal(); }
-  S.mode = "live"; render();
-  // Pick up friends' entries and scores; pause while the tab is hidden.
-  setInterval(() => { if (!document.hidden) refresh().catch(() => {}); }, 5000);
-  document.addEventListener("visibilitychange", () => { if (!document.hidden) refresh().catch(() => {}); });
-}
-init();
+/* ---------- start, then keep up with everyone else's changes ---------- */
+readRoute();
+setInterval(() => { if (!document.hidden && !$("dlg").open) refresh().catch(() => { S.offline = true; render(); }); }, 5000);
+document.addEventListener("visibilitychange", () => { if (!document.hidden) refresh().catch(() => {}); });
 </script>
 </body>
 </html>
